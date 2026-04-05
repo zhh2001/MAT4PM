@@ -1,0 +1,91 @@
+\documentclass[twocolumn]{article}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\hyphenation{}
+
+% 修改处采用 \rev{} 包裹，下面 \newcommand 两个二选一，要注释掉另一个
+\usepackage{xcolor}
+% \newcommand{\rev}[1]{\textcolor{blue}{#1}} % 生成带标注的 marked version
+\newcommand{\rev}[1]{#1} % 生成不带标注的正常版本 clean version
+
+\begin{document}
+
+\title{MAT4PM: Machine Learning-Guided Adaptive Threshold Control\\
+for P4-based Monitoring in SDNs}
+
+\author{
+    Henghua Zhang,
+    Jue Chen, 
+    Haidong Peng, 
+    and Junru Chen
+    \thanks{
+        The authors are with the School of Electronic and Electrical Engineering, 
+        Shanghai University of Engineering Science, 
+        Shanghai 201620, China 
+        (e-mail: \href{mailto:zhang@sues.edu.cn}{zhang@sues.edu.cn}; 
+                 \href{mailto:jadeschen@sues.edu.cn}{jadeschen@sues.edu.cn}; 
+                 \href{mailto:m325124607@sues.edu.cn}{m325124607@sues.edu.cn}; 
+                 \href{mailto:m325124267@sues.edu.cn}{m325124267@sues.edu.cn}). 
+        \textit{(Corresponding author: Jue Chen.)}
+    }
+}
+
+\date{}
+
+\maketitle
+
+\begin{center}
+\footnotesize{\copyright~IEEE. Personal use of this material is permitted.\\
+For other uses, permission must be obtained from IEEE.}
+\end{center}
+
+\noindent
+This is the author’s version of a work accepted for publication in 
+\textit{IEEE Transactions on Network and Service Management}.  
+The final version is available at IEEE Xplore:
+\url{https://doi.org/10.1109/TNSM.2026.3677416}
+
+\begin{abstract}
+    This paper presents MAT4PM, a P4-based proactive monitoring framework designed for Software-Defined Networking (SDN). 
+    % To the best of our knowledge, this is the first monitoring framework to jointly leverage programmable data plane capabilities for event-driven data collection and control plane intelligence for real-time threshold optimization. 
+    \rev{This is the first monitoring framework that combines Programmable Data Plane (PDP) capabilities for event-driven data collection with control plane intelligence for real-time threshold optimization.} 
+    % The system architecture comprises a lightweight P4-based monitoring module deployed at the switch, a machine learning inference engine operating at the controller, and a P4Runtime feedback channel for real-time threshold updates. 
+    \rev{The architecture consists of a lightweight P4-based monitoring module deployed at the switch, a Machine Learning (ML) inference engine running at the controller, and a P4Runtime feedback channel for real-time threshold updates.} 
+    % The framework leverages traffic features to predict optimal monitoring thresholds, which are subsequently synchronized to the data plane. 
+    \rev{Traffic features are leveraged to predict optimal monitoring thresholds, which are then synchronized with the data plane.}
+    % A composite cost function is introduced, jointly considering monitoring error and communication overhead, to guide the model toward a balanced trade-off between accuracy and efficiency. 
+    \rev{A composite cost function is introduced to jointly consider monitoring error and communication overhead, guiding the model toward a balanced trade-off between accuracy and efficiency.}
+    Experimental evaluation on BMv2 software switches demonstrates that, compared to static threshold strategies, MAT4PM reduces monitoring error to 7.0\% and achieves a 5.6\% reduction in overall cost, while maintaining sub-millisecond inference latency and minimal resource consumption. 
+    % These results indicate strong practical viability and scalability for real-world SDN environments.
+    \rev{These results demonstrate the practical viability and scalability of MAT4PM in SDN environments.}
+\end{abstract}
+
+\noindent \textbf{Keywords:} 
+Software-Defined Networking, 
+Programmable Data Plane, 
+Machine Learning, 
+Network Monitoring, 
+P4
+
+\input{sections/intro}
+\input{sections/bg}
+\input{sections/method}
+\input{sections/evaluation}
+\input{sections/conclusion}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
