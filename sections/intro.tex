@@ -1,0 +1,94 @@
+\section{Introduction}
+
+With the continuous expansion of network scale and complexity, traditional network architectures are increasingly challenged in terms of flexibility, scalability, and automated management. 
+Software-Defined Networking (SDN)~\cite{JANG2023105736} has emerged as a novel architectural paradigm that decouples the control plane from the data plane, enabling centralized management and flexible configuration of network resources~\cite{9360650}. 
+While SDN's centralized control plane enables dynamic network orchestration through protocols such as OpenFlow~\cite{10.1145/1355734.1355746}, effective management depends not merely on rule deployment but also on real-time state awareness. 
+% Accurate and timely acquisition of network states is thus indispensable, underscoring monitoring as a fundamental SDN capability~\cite{10.1145/3556973}.
+\rev{Accurate and timely acquisition of network states is essential, making monitoring a fundamental SDN capability~\cite{10.1145/3556973}.}
+
+SDN switches inherently support the collection of flow-level statistics such as packet counts, byte volumes, and flow duration, providing a foundation for fine-grained traffic monitoring \cite{KALAMBE2025104081}. Existing monitoring mechanisms primarily fall into two categories: push-based \cite{10.1145/3373360.3380830, 6888899, 10.1007/978-3-642-36516-4_4} and pull-based \cite{7037094, CASTILLO2020107108, 8411125, 10.1007/978-3-642-12334-4_21} approaches. 
+Push-based schemes periodically or event-drivenly transmit flow statistics to the controller, offering better timeliness but often leading to congestion in the control channel and excessive load on the controller. 
+In contrast, pull-based schemes rely on the controller to actively request statistics, offering greater flexibility but suffering from trade-offs between accuracy and overhead: short polling intervals increase system burden, while longer intervals risk delayed anomaly detection. 
+Moreover, in either case, the centralized accumulation of monitoring data at the controller may introduce performance bottlenecks, undermining critical tasks such as route computation and flow table updates \cite{8291608}.
+
+The advent of data plane programmability, particularly with the rise of the P4 (Programming Protocol-Independent Packet Processors) language~\cite{10.1145/2656877.2656890}, has revolutionized traffic monitoring in SDN. 
+P4 enables protocol-agnostic and behavior-customized packet processing, allowing switches to implement more flexible and efficient data collection strategies \cite{HAUSER2023103561}. 
+For instance, by embedding lightweight filtering or labeling logic within the switch pipeline, non-essential data can be preprocessed and discarded locally, thereby reducing the volume of traffic forwarded to the controller and alleviating pressure on the control plane \cite{10130445}. 
+Nonetheless, designing a monitoring mechanism that achieves high accuracy with low overhead under a programmable data plane (PDP)~\cite{PDP} architecture remains an open and challenging problem \cite{KAUR2021109}.
+
+Meanwhile, Machine Learning (ML) has shown considerable promise in network management, particularly in behavior modeling of complex systems, anomaly detection, and policy optimization \cite{JAMSHIDI2025111103, JISI2025110939, Serag2025, 10480735, 10273389, 10198239, FOSIC2023100466, 9505258}. 
+In the context of SDN monitoring, ML-based approaches can assist the controller in dynamically adjusting monitoring policies under uncertain or time-varying traffic conditions---e.g., by selectively sampling flows \cite{9335605}---thus improving the balance between monitoring accuracy and system overhead. 
+Although prior works have investigated Reinforcement Learning (RL)~\cite{RL}, Supervised Learning (SL)~\cite{SupervisedLearning}, or Federated Learning (FL)~\cite{FL} for optimizing monitoring policies, few have fully leveraged the programmability offered by P4 to jointly optimize the trade-off between control overhead and monitoring precision from both the data and control planes \cite{SONI2022103419}. 
+% As far as is known, this is the first paper to propose an SDN monitoring framework that explicitly integrates programmable data plane mechanisms enabled by P4 with machine learning-based adaptive policy inference on the control plane. 
+\rev{This paper presents the first SDN monitoring framework that integrates P4-enabled programmable data plane mechanisms with machine learning-based adaptive policy inference on the control plane.} 
+This cross-plane coordination enables closed-loop, fine-grained monitoring with improved adaptability and efficiency. 
+Based on this architectural principle, a framework named MAT4PM (Machine Learning-Guided Adaptive Threshold Control for P4-based Monitoring) is developed. 
+It integrates event-driven monitoring logic implemented in the P4 data plane with predictive threshold adjustment conducted by control-plane machine learning models~\cite{MAT4PM}. 
+The primary contributions are summarized as follows:
+
+\begin{enumerate}
+    
+    \item A collaborative monitoring mechanism is designed and implemented by combining P4-based active reporting at the data plane with machine learning-driven policy tuning at the control plane. 
+    Building upon the advantages of proactive schemes such as PPM (P4-based Proactive Monitoring) \cite{10623873}, the proposed approach eliminates the reliance on manually configured thresholds by dynamically predicting monitoring intervals through learned models with real-time traffic features as input. 
+    The system establishes a closed-loop architecture characterized by data plane event triggering and control plane intelligent decision-making, thereby achieving high accuracy, low overhead, and strong adaptability under dynamic traffic scenarios.
+    
+    \item A data construction methodology is formulated to support optimal threshold learning and facilitate the generation of a high-quality labeled dataset. 
+    Optimal thresholds are derived from offline simulations that minimize a jointly defined cost function, serving as ground truth labels for supervised learning. 
+    Packet trace files (pcap)~\cite{pcap} captured from the BMv2 switch under various monitoring intervals are replayed to quantify estimation errors and communication overheads.
+    
+    \item A full prototype system is developed, comprising P4-based data plane logic, controller-side decision modules, and three mainstream machine learning models---eXtreme Gradient Boosting (XGBoost)~\cite{XGBoost}, Light Gradient Boosting Machine (LightGBM)~\cite{LightGBM}, and Support Vector Machine (SVM)~\cite{SVM}. 
+    Experimental results demonstrate that, compared to fixed-threshold schemes, the proposed dynamic adjustment mechanism reduces the average estimation error from 9.1\% to 7.0\% and lowers the overall monitoring cost by 5.6\%. 
+    In addition, the models exhibit low prediction latency (all below 5~ms) and minimal resource consumption (memory usage: 13.89 KB-36.24 KB), indicating the feasibility of real-time deployment in operational environments.
+    
+\end{enumerate}
+
+% \rev{The terminology and abbreviations used throughout this paper are summarized in Table~\ref{tab:acronyms} for reference.} 
+The remainder of this paper is organized as follows. Section~\ref{sec2} reviews background and related work, including fundamental concepts of programmable data planes and existing P4-based monitoring approaches. Section~\ref{sec3} details the architecture and core components of the proposed MAT4PM system. Section~\ref{sec4} presents experimental evaluations to validate the effectiveness of our method. Section~\ref{sec5} concludes the paper and discusses potential future research directions.
+
+% \begin{table}[!t]
+%     \centering
+%     \caption{\rev{List of Acronyms and Definitions}}
+%     \label{tab:acronyms}
+%     \begin{tabular}{p{0.09\textwidth} p{0.35\textwidth}}
+%         \toprule
+%         \multirow{1}{=}{\textbf{Abbreviation}} & \textbf{Definition} \\
+%         \midrule
+%         \rev{API} & \rev{Application Programming Interface} \\
+%         \rev{ASIC} & \rev{Application-Specific Integrated Circuit} \\
+%         \rev{BMv2} & \rev{Behavioral Model version 2} \\
+%         \rev{BPS} & \rev{Bits Per Second} \\
+%         \rev{CI} & \rev{Confidence Interval} \\
+%         \rev{CPU} & \rev{Central Processing Unit} \\
+%         \rev{DLINT} & \rev{Deterministic Lightweight In-Band Network Telemetry} \\
+%         \rev{DPDK} & \rev{Data Plane Development Kit} \\
+%         \rev{FL} & \rev{Federated Learning} \\
+%         \rev{FS-INT} & \rev{Flexible Sampling-based In-band Network Telemetry} \\
+%         \rev{INT} & \rev{In-band Network Telemetry} \\
+%         \rev{INTO} & \rev{In-band Network Telemetry Orchestration} \\
+%         \rev{LightGBM} & \rev{Light Gradient Boosting Machine} \\
+%         \rev{LB} & \rev{Load Balancing} \\
+%         \rev{MAC} & \rev{Media Access Control} \\
+%         \rev{MSE} & \rev{Mean Squared Error} \\
+%         \rev{ML} & \rev{Machine Learning} \\
+%         \rev{OVS} & \rev{Open vSwitch} \\
+%         \rev{P4} & \rev{Programming Protocol-independent Packet Processor} \\
+%         \rev{PCAP} & \rev{Packet Capture} \\
+%         \rev{PDP} & \rev{Programmable Data Plane} \\
+%         \rev{PLINT} & \rev{Probabilistic Lightweight In-Band Network Telemetry} \\
+%         \rev{PPM} & \rev{P4-based Proactive Monitoring} \\
+%         \rev{PPS} & \rev{Packets Per Second} \\
+%         \rev{RAM} & \rev{Random Access Memory} \\
+%         \rev{RL} & \rev{Reinforcement Learning} \\
+%         \rev{RPC} & \rev{Remote Procedure Call} \\
+%         \rev{Std. Dev.} & \rev{Standard Deviation} \\
+%         \rev{SDN} & \rev{Software-defined Networking} \\
+%         \rev{SL} & \rev{Supervised Learning} \\
+%         \rev{SVM} & \rev{Support Vector Machine} \\
+%         \rev{TCP} & \rev{Transmission Control Protocol} \\
+%         \rev{TBSW} & \rev{Time-based Sliding Window} \\
+%         \rev{UDP} & \rev{User Datagram Protocol} \\
+%         \rev{VM} & \rev{Virtual Machine} \\
+%         \rev{XGBoost} & \rev{eXtreme Gradient Boosting} \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}

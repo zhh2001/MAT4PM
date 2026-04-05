@@ -1,0 +1,21 @@
+\section{Conclusions and Future Works}
+\label{sec5}
+
+\noindent This paper presents MAT4PM, an active monitoring framework that integrates machine learning based control plane with a programmable data plane to enable adaptive and fine-grained threshold control in SDN. 
+% The proposed system leverages the P4 language to implement lightweight monitoring logic on the switch side, in conjunction with a controller-side learning module that dynamically adjusts monitoring intervals, coordinated via a P4Runtime-based feedback interface. 
+\rev{The system leverages the P4 language to implement lightweight monitoring logic on the switch side. 
+A controller-side learning module dynamically adjusts monitoring intervals through a P4Runtime-based feedback interface.} 
+This control interface connects the data and control planes, enabling timely synchronization between observed traffic conditions and policy updates. 
+By introducing a composite cost function that jointly considers monitoring accuracy and communication overhead, MAT4PM effectively balances performance and efficiency through event-driven threshold updates.
+
+Comprehensive evaluations in the Mininet environment and on BMv2 software switches demonstrate that the dynamic threshold schemes powered by machine learning models consistently outperform traditional fixed-threshold baselines across multiple metrics. 
+Specifically, the dynamic schemes reduce average monitoring error from 9.1\% to 7.0\%, improve reporting precision, and lower overall monitoring cost by 5.6\%. 
+The inference delay of the models remains below the millisecond scale, and resource consumption is minimal, indicating the practical deployability and scalability of the proposed approach in real-world network conditions.
+
+\rev{
+Future research directions include several complementary extensions to further enhance the practicality and robustness of MAT4PM. 
+First, reinforcement learning and other online or self-supervised learning paradigms will be investigated to reduce or eliminate the reliance on offline labeled datasets, enabling continuous adaptation under evolving traffic conditions without manual data annotation. 
+Second, deployment on physical programmable hardware platforms will be explored to assess system behavior under realistic traffic workloads and hardware constraints. 
+In this context, additional aspects that remain unexplored in the current study, such as in-network security protection, fault tolerance under switch or controller failures, and energy efficiency of continuous monitoring and control operations, will be systematically examined. 
+These directions aim to extend MAT4PM toward a more secure, resilient, and energy-aware intelligent monitoring framework suitable for large-scale operational networks.
+}
